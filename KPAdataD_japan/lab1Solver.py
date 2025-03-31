@@ -1,4 +1,5 @@
 import numpy as np
+import sympy as sp
 
 p = 11
 
@@ -19,28 +20,9 @@ def readFile(path) :
             k0 = k0.split(',')
             k0 = list(map(lambda x: int(x), k0))
             l = list(map(lambda x: int(x), l))
-            # print(l)
-
-            k = findSubkey(k0)
-
-            """
-            k1 = [k0[1], k0[3], k0[5], k0[7]]
-            k2 = [k0[1], k0[2], k0[3], k0[4]]
-            k3 = [k0[1], k0[4], k0[5], k0[8]]
-            k4 = [k0[1], k0[4], k0[6], k0[7]]
-            k5 = [k0[1], k0[3], k0[6], k0[8]]
-            k6 = [k0[3], k0[4], k0[5], k0[6]]
-            
-            k = []
-            k.append(k1)
-            k.append(k2)
-            k.append(k3)
-            k.append(k4)
-            k.append(k5)
-            k.append(k6)
-            """
+            #k = findSubkey(k0)
             lines.append(l)
-            keys.append(k)
+            keys.append(k0)
             
     return lines, keys
 
@@ -157,10 +139,10 @@ def sum(input, key):
 
 def findMatrixA():
     message = np.zeros(8)
-    A = np.zeros((8,8), dtype=int)
+    A = np.zeros((8,8), )
     for i in range (0,8):
         #print("giro ",i,":")
-        key = np.zeros(8, dtype=int)
+        key = np.zeros(8)
         key[i] = 1
         #print("chiave generata: ", key)
         k = findSubkey(key)
@@ -170,13 +152,56 @@ def findMatrixA():
     return A  
 
 def findMatrixB():
-    message = np.zeros(8)
+    key = np.zeros(8)
+    k = findSubkey(key)
+    B = np.zeros((8,8))
+    for i in range(0,8):
+        #print("giro ",i,":")
+        message = np.zeros(8)
+        message[i] = 1
+        #print("messaggio generato: ", message)
+        b = encrypt(message, k)
+        #print("Linea generata: ", b)
+        B[:,i] = b
+    return B
+
+def modPMatrixInverter(matrix, p):
+    matrix = np.array(matrix)
+    sympyMat = sp.Matrix(matrix)
+    RealInvMat = sympyMat.inv()
+    #prova = RealInvMat@matrix
+    #print("vediamo se worka:\n", prova)
+    detMat = int(sympyMat.det())
+    #print("determinante: ", detMat)
+    SomeMat = RealInvMat*detMat
+    invDet = pow(detMat, -1, p)
+    invMatMod = np.mod(SomeMat*invDet, p)
+    return invMatMod
+
+def KPACryptoanalysis(texts, cyphers):
+    matA = findMatrixA()
+    matA =np.array(matA)
+    invA = modPMatrixInverter(matA, p)
+    invA = np.array(invA)
+    matB = findMatrixB()
+    matB = np.array(matB)
+    keys = np.zeros((5,8))
+    for i, (t, c) in enumerate(zip(texts, cyphers)):
+        t = np.array(t)
+        c =np.array(c)
+        tmp = np.mod(matB@t, p).flatten()
+        tmp = np.mod(c - tmp, p)
+        k = np.mod(invA@tmp, p).flatten()
+        keys[i,:] = k
+    return keys     
+
 
 def main():
-    """
-    lines, keysMat = readFile('KPAdataD_japan/KPApairsD_linear.txt')
-    #lines, keysMat = readFile('KPAdataD_japan/check.txt')
-    #print("tutte le lineee:", lines)
+    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
+    #lines, longKeys = readFile('KPAdataD_japan/check.txt')
+    keysMat = []
+    for k in longKeys:
+        keysMat.append(findSubkey(k))
     
     for line, keys in zip(lines, keysMat) :
         print("plaintext: ", line)
@@ -184,9 +209,23 @@ def main():
         print("encrypting:", e)
         d =decrypt(e,keys)
         print("decrypting: ", d, "\n")
-    """
     matA = findMatrixA()
     print("Matrice A relativa alle chiavi:\n", matA)
+    matB = findMatrixB()
+    print("Matrice B relativa ai messaggi:\n", matB)
+    possibleK = KPACryptoanalysis(lines, longKeys)
+    for i, k in enumerate(possibleK):
+        print("Possibile chiave numero ", i, ":\n", k) 
+    #[6.00000002; 5.99999997; 4.99999999; 3.99999998; 5.99999999; 5.00000004;  2.     ;    8.      ] 
+    # --> possible key [6;6;5;4;6;5;2;8]
+
+    #code to test that the key founded is the right one
+    k = findSubkey([6,6,5,4,6,5,2,8])
+    for text in lines:
+        prova = encrypt(text, k)
+        print(prova)
+
+
 
 if __name__ == '__main__':
     main()
