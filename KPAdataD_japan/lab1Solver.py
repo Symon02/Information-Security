@@ -44,7 +44,7 @@ def findSubkey(key):
     k.append(k6)
     return k
 
-def encrypt(line, key):
+def encrypt(line, key, NL = False):
     key = np.array(key)
     line = np.array(line)
     for i in range(0,4):
@@ -52,11 +52,17 @@ def encrypt(line, key):
             v = sum(line, key[i])
         else:
             v = sum (w, key[i])
-        y = blockS(v)
+        if NL:
+            y = blockSNL(v)
+        else:
+            y = blockS(v)
         z = blockT(y)
         w = blockL(z)
     v_fin = sum(w, key[4])
-    y_fin = blockS(v_fin)
+    if NL:
+        y_fin = blockSNL(v_fin)
+    else:
+        y_fin = blockS(v_fin)
     z_fin = blockT(y_fin)
     x = sum(z_fin, key[5])
     return x
@@ -195,18 +201,25 @@ def KPACryptoanalysis(texts, cyphers):
         keys[i,:] = k
     return keys     
 
+def blockSNL(input):
+    input = np.array(input)
+    switches = [0,2,4,8,6,10,1,3,5,7,9]
+    switches = np.array(switches)
+    out = [switches[n] for n in input]
+    return np.array(out)
 
 def main():
-    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
-    #lines, longKeys = readFile('KPAdataD_japan/check.txt')
+    #lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
+    lines, longKeys = readFile('KPAdataD_japan/check.txt')
     keysMat = []
     for k in longKeys:
         keysMat.append(findSubkey(k))
     
     for line, keys in zip(lines, keysMat) :
         print("plaintext: ", line)
-        e = encrypt(line, keys)
+        e = encrypt(line, keys, True)
         print("encrypting:", e)
+        """
         d =decrypt(e,keys)
         print("decrypting: ", d, "\n")
     matA = findMatrixA()
@@ -224,7 +237,7 @@ def main():
     for text in lines:
         prova = encrypt(text, k)
         print(prova)
-
+    """
 
 
 if __name__ == '__main__':
