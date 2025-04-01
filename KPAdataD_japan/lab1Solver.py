@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 
+task6NumTry = 50000
 p = 11
 
 def readFile(path) :
@@ -67,22 +68,31 @@ def encrypt(line, key, NL = False):
     x = sum(z_fin, key[5])
     return x
 
-def decrypt(x, keys):
+def decrypt(x, keys, NL = False):
     keys = np.array(keys)
     z = sottraction(x, keys[-1])
     y = invBlockT(z)
-    v = invBlockS(y)
+    if NL:
+        v= invBlockSNL(y)
+    else:
+        v = invBlockS(y)
     for i in range(2,6):
         if i==2:
             w = sottraction(v, keys[-i])
             z1 = invBlockL(w)
             y1 = invBlockT(z1)
-            v1 = invBlockS(y1)
+            if NL:
+                v1 = invBlockSNL(y1)
+            else:
+                v1 = invBlockS(y1)
         else:
             w = sottraction(v1, keys[-i])
             z1 = invBlockL(w)
             y1 = invBlockT(z1)
-            v1 = invBlockS(y1)
+            if NL:
+                v1 = invBlockSNL(y1)
+            else:
+                v1 = invBlockS(y1)
 
     u = sottraction(v1, keys[0])
     return u
@@ -143,9 +153,9 @@ def sum(input, key):
     out = np.mod(out, p)
     return out
 
-def findMatrixA():
+def findMatrixKey(NL = False):
     message = np.zeros(8)
-    A = np.zeros((8,8), )
+    A = np.zeros((8,8))
     for i in range (0,8):
         #print("giro ",i,":")
         key = np.zeros(8)
@@ -155,9 +165,9 @@ def findMatrixA():
         a = encrypt(message, k)
         #print("Linea generata: ", a)
         A[:,i] = a
-    return A  
+    return A%p  
 
-def findMatrixB():
+def findMatrixMessage(NL=False):
     key = np.zeros(8)
     k = findSubkey(key)
     B = np.zeros((8,8))
@@ -166,10 +176,10 @@ def findMatrixB():
         message = np.zeros(8)
         message[i] = 1
         #print("messaggio generato: ", message)
-        b = encrypt(message, k)
+        b = encrypt(message, k, NL)
         #print("Linea generata: ", b)
         B[:,i] = b
-    return B
+    return B%p
 
 def modPMatrixInverter(matrix, p):
     matrix = np.array(matrix)
@@ -184,12 +194,12 @@ def modPMatrixInverter(matrix, p):
     invMatMod = np.mod(SomeMat*invDet, p)
     return invMatMod
 
-def KPACryptoanalysis(texts, cyphers):
-    matA = findMatrixA()
+def KPACryptoanalysisLinear(texts, cyphers):
+    matA = findMatrixKey()
     matA =np.array(matA)
     invA = modPMatrixInverter(matA, p)
     invA = np.array(invA)
-    matB = findMatrixB()
+    matB = findMatrixMessage()
     matB = np.array(matB)
     keys = np.zeros((5,8))
     for i, (t, c) in enumerate(zip(texts, cyphers)):
@@ -202,32 +212,110 @@ def KPACryptoanalysis(texts, cyphers):
     return keys     
 
 def blockSNL(input):
-    input = np.array(input)
+    input = np.array(input).astype(int)
     switches = [0,2,4,8,6,10,1,3,5,7,9]
     switches = np.array(switches)
     out = [switches[n] for n in input]
     return np.array(out)
 
+def invBlockSNL(input):
+    input = np.array(input).astype(int)
+    invSwitches = [0,6,1,7,2,8,4,9,3,10,5]
+    invSwitches = np.array(invSwitches).astype(int)
+    out = [invSwitches[n] for n in input]
+    return np.array(out).astype(int)
+
+def testMat(A,B,C,plain,cypher,key, numbTry):
+    ok = 0
+    A = np.array(A)
+    B = np.array(B)
+    C = np.array(C)
+    for u, x, k in zip(plain, cypher, key):
+        u = np.array(u)
+        x = np.array(x)
+        k = np.array(k)
+        out = A@k + B@u +C@x
+        out = out.flatten()
+        out =np.mod(out, p)
+        #print(np.mod(np.sum(out), p))
+        if np.mod(np.sum(out), p)==0:
+            ok = ok+1
+    return ok/numbTry
+
+def LinApproxBlocSNL(input):
+    input = np.array(input).astype(int)
+    out = []
+    for n in input:
+        value = (n-(11-n)) % p
+        out.append(value)
+    out = np.array(out)
+    return out
+
+def findMatrixC():
+    C = np.zeros((8,8))
+    for i in range(0,8):
+        #print("giro ",i,":")
+        message = np.zeros(8)
+        message[i] = 1
+        #print("messaggio generato: ", message)
+        c = LinApproxBlocSNL(message)
+        #print("Linea generata: ", b)
+        C[:,i] = c
+    return C%p
+ 
+def KPACryptoanalysisNearLinear(texts, cyphers):
+    matA = findMatrixKey(NL = True)
+    matA =np.array(matA)
+    invA = modPMatrixInverter(matA, p)
+    invA = np.array(invA)
+    matB = findMatrixMessage(NL = True)
+    matB = np.array(matB)
+    matC = findMatrixC()
+    matC = np.array(matC)
+    matA,matB,matC = matA%p, matB%p, matC%p
+    keys = np.zeros((5,8))
+    for i, (u, x) in enumerate(zip(texts, cyphers)):
+        u = np.array(u)
+        x = np.array(x)
+        tmp = ((matB@u)%p).flatten()
+        tmp2 = ((matC@x)%p).flatten()
+        finTemp = ((tmp2 - tmp)%p)
+        k = ((invA@finTemp)%p).flatten()
+        keys[i,:] = k%p 
+    return keys%p
+
 def main():
     #lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
-    lines, longKeys = readFile('KPAdataD_japan/check.txt')
+    #lines, longKeys = readFile('KPAdataD_japan/check.txt')
+    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
     keysMat = []
-    for k in longKeys:
+    #print("Inizio a creare i vettori")
+    #lines, longKeys = np.random.randint(0, 10, (task6NumTry, 8)), np.random.randint(0, 10, (task6NumTry, 8))
+    lines = np.array(lines)
+    longKeys = np.array(lines)
+    cyphArr = np.zeros((task6NumTry,8))
+    #print("finito di creare i vettori")
+    for i, k in enumerate(longKeys):
+        #print("Separo la chiave: ", i)
         keysMat.append(findSubkey(k))
-    
-    for line, keys in zip(lines, keysMat) :
-        print("plaintext: ", line)
+    #print("Finito di creare le sottochiavi")
+    for z, (line, keys) in enumerate(zip(lines, keysMat)):
+        #print("Cripto la inea: ", z)
+        i = 0
+        #print("plaintext: ", line)
         e = encrypt(line, keys, True)
-        print("encrypting:", e)
-        """
-        d =decrypt(e,keys)
-        print("decrypting: ", d, "\n")
-    matA = findMatrixA()
-    print("Matrice A relativa alle chiavi:\n", matA)
-    matB = findMatrixB()
-    print("Matrice B relativa ai messaggi:\n", matB)
-    possibleK = KPACryptoanalysis(lines, longKeys)
-    for i, k in enumerate(possibleK):
+        cyphArr[i,:] = e
+        i+=1
+        #print("encrypting:", e)
+        d =decrypt(e,keys, True)
+        #print("decrypting: ", d, "\n")
+    matA = findMatrixKey(True)
+    #print("Matrice A relativa alle chiavi:\n", matA.astype(int))
+    matB = findMatrixMessage(True)
+    #print("Matrice B relativa ai messaggi:\n", matB.astype(int))
+    """
+    possibleLinearK = KPACryptoanalysisLinear(lines, longKeys)
+    for i, k in enumerate(possibleLinearK):
         print("Possibile chiave numero ", i, ":\n", k) 
     #[6.00000002; 5.99999997; 4.99999999; 3.99999998; 5.99999999; 5.00000004;  2.     ;    8.      ] 
     # --> possible key [6;6;5;4;6;5;2;8]
@@ -238,7 +326,36 @@ def main():
         prova = encrypt(text, k)
         print(prova)
     """
+    matC = findMatrixC()
+    #print("Mst A:\n", matA, "\nMat B:\n", matB, "\nMat C:\n", matC)
+    prob = testMat(matA,matB,matC,lines,cyphArr,longKeys,task6NumTry)
+    #print("Our probability: ",prob, "\nTreshold probability: ", (1/p**8))
 
+    """
+    """
+    possibleNLKey = KPACryptoanalysisNearLinear(lines, longKeys)
+    for i, k in enumerate(possibleNLKey):
+        print("Possibile chiave numero ", i+1, ":\n", list(map(round, k)))
+    
+    """
+    [7, 4, 3, 3, 6, 2, 7, 4]
+    [9, 3, 9, 5, 9, 6, 4, 9]
+    [9, 7, 9, 2, 10, 6, 7, 4]   --> actual key = [7,6,3,9,0,9,2,9]
+    [0, 0, 0, 4, 0, 6, 2, 5]
+    [6, 7, 6, 8, 1, 3, 3, 3]
+    """
+
+    k = findSubkey([7,6,3,9,0,9,2,9])
+    for text in lines:
+        prova = encrypt(text, k, NL = True)
+        #print(prova)
+"""
+[ 0 10  6  5 10  3  5  6]
+[ 6  7  0  9  7 10  0  3]
+[ 8  5 10  7  4  2  2  5]
+[10  7  9 10  4  3  7 10]
+[0 5 0 9 2 2 3 8]
+"""
 
 if __name__ == '__main__':
     main()
