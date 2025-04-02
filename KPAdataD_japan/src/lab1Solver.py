@@ -13,7 +13,7 @@ NoLin=True
 verbose = True
 
 def main():
-    """
+    
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
     if NL:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
@@ -68,14 +68,14 @@ def main():
         possibleNLKey = KPACryptoanalysisNearLinear(lines, longKeys)
         for i, k in enumerate(possibleNLKey):
             print("Possible key for NL number ", i+1, ":\n", list(map(round, k)))
-
+        """
         POSSIBLE NL KEYS:
             [7, 4, 3, 3, 6, 2, 7, 4]
             [9, 3, 9, 5, 9, 6, 4, 9]
             [9, 7, 9, 2, 10, 6, 7, 4]   --> actual key = [7,6,3,9,0,9,2,9]
             [0, 0, 0, 4, 0, 6, 2, 5]
             [6, 7, 6, 8, 1, 3, 3, 3]
-        
+        """
         #actual key test. It was finded by brute force
         k = findSubkey([7,6,3,9,0,9,2,9])
         print("Cryping with the finded near linear key:\n")
@@ -86,7 +86,7 @@ def main():
     for ik, exk in zip(intKey, extKey):
         print("Internal key: ", ik, "\nExternal key: ", exk)
         """
-    """
+    
     Internal key:  [6  5  9 10] 
     External key:  [0 0 3 5]
 
