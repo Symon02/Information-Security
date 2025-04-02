@@ -25,14 +25,23 @@ def readFile(path) :
             
     return lines, keys
 
-def findSubkey(key):
-    k0= np.array(key)
-    k1 = [k0[0], k0[2], k0[4], k0[6]]
-    k2 = [k0[0], k0[1], k0[2], k0[3]]
-    k3 = [k0[0], k0[3], k0[4], k0[7]]
-    k4 = [k0[0], k0[3], k0[5], k0[6]]
-    k5 = [k0[0], k0[2], k0[5], k0[7]]
-    k6 = [k0[2], k0[3], k0[4], k0[5]]
+def findSubkey(key, NoLin = False):
+    if NoLin:
+        k0 = np.array(key)
+        k1 = [k0[0], k0[1], k0[2], k0[3]]
+        k2 = [k0[0], k0[1], k0[3], k0[2]]
+        k3 = [k0[1], k0[2], k0[3], k0[0]]
+        k4 = [k0[0], k0[3], k0[1], k0[2]]
+        k5 = [k0[2], k0[3], k0[0], k0[1]]
+        k6 = [k0[1], k0[3], k0[0], k0[2]]
+    else:
+        k0= np.array(key)
+        k1 = [k0[0], k0[2], k0[4], k0[6]]
+        k2 = [k0[0], k0[1], k0[2], k0[3]]
+        k3 = [k0[0], k0[3], k0[4], k0[7]]
+        k4 = [k0[0], k0[3], k0[5], k0[6]]
+        k5 = [k0[0], k0[2], k0[5], k0[7]]
+        k6 = [k0[2], k0[3], k0[4], k0[5]]
     k = []
     k.append(k1)
     k.append(k2)
@@ -42,7 +51,7 @@ def findSubkey(key):
     k.append(k6)
     return k
 
-def encrypt(line, key, NL = False):
+def encrypt(line, key, NL = False, NoLin = False):
     key = np.array(key)
     line = np.array(line)
     for i in range(0,4):
@@ -52,6 +61,8 @@ def encrypt(line, key, NL = False):
             v = sum (w, key[i])
         if NL:
             y = blockSNL(v)
+        elif NoLin:
+            y = noLinBlockS(v)
         else:
             y = blockS(v)
         z = blockT(y)
@@ -59,18 +70,22 @@ def encrypt(line, key, NL = False):
     v_fin = sum(w, key[4])
     if NL:
         y_fin = blockSNL(v_fin)
+    elif NoLin:
+        y_fin =noLinBlockS(v_fin)
     else:
         y_fin = blockS(v_fin)
     z_fin = blockT(y_fin)
     x = sum(z_fin, key[5])
     return x
 
-def decrypt(x, keys, NL = False):
+def decrypt(x, keys, NL = False, NoLin = False):
     keys = np.array(keys)
     z = sottraction(x, keys[-1])
     y = invBlockT(z)
     if NL:
-        v= invBlockSNL(y)
+        v = invBlockSNL(y)
+    elif NoLin:
+        v = invNoLinBlockS(y)
     else:
         v = invBlockS(y)
     for i in range(2,6):
@@ -80,6 +95,8 @@ def decrypt(x, keys, NL = False):
             y1 = invBlockT(z1)
             if NL:
                 v1 = invBlockSNL(y1)
+            elif NoLin:
+                v1 = invNoLinBlockS(y1)
             else:
                 v1 = invBlockS(y1)
         else:
@@ -88,6 +105,8 @@ def decrypt(x, keys, NL = False):
             y1 = invBlockT(z1)
             if NL:
                 v1 = invBlockSNL(y1)
+            elif NoLin:
+                v1 = invNoLinBlockS(y1)
             else:
                 v1 = invBlockS(y1)
 
@@ -109,7 +128,7 @@ def blockT (input):
     out = input[0:4]
     input = np.flip(input)
     out = np.hstack((out, input[0:4]))
-    return out
+    return out%p
 
 def invBlockT(input):
     input = np.array(input)
@@ -125,7 +144,7 @@ def blockL(input):
     Matrix = np.array(Matrix)
     out = np.mod(Matrix@input, p)
     out = out.flatten()
-    return out
+    return out%p
 
 def invBlockL(input):
     input = np.array(input)
@@ -148,7 +167,7 @@ def sum(input, key):
     key = np.array(key)
     out = input + np.hstack((key, key))
     out = np.mod(out, p)
-    return out
+    return out%p
 
 def blockSNL(input):
     input = np.array(input).astype(int)
@@ -171,4 +190,14 @@ def LinApproxBlocSNL(input):
         value = (n-(11-n)) % p
         out.append(value)
     out = np.array(out)
+    return out
+
+# 0 non viene invertito perchè si
+def noLinBlockS(input):
+    out = [2*(pow(int(i), -1, p)) if i !=0 else 0 for i in input]
+    return out
+
+def invNoLinBlockS(input):
+    # Compute 2^(-1) mod p = 6
+    out = [2*(pow(int(i), -1, p)) % p if i != 0 else 0 for i in input]
     return out

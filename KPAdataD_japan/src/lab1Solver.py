@@ -8,14 +8,16 @@ from KPACryptoanalysis import *
 task6NumTry = 50000
 p = 11
 NL=False
-
-verbose = False
+NoLin=True
+verbose = True
 
 def main():
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
     if NL:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
-    #lines, longKeys = readFile('KPAdataD_japan/check.txt')
+    if NoLin:
+        lines, longKeys = readFile('KPAdataD_japan/KPApairsD_non_linear.txt')
+    #lines, longKeys = readFile('KPAdataD_japan/checkNoLin.txt')
     #lines, longKeys = np.random.randint(0, 10, (task6NumTry, 8)), np.random.randint(0, 10, (task6NumTry, 8))
     keysMat = []
     if NL:
@@ -23,16 +25,17 @@ def main():
         longKeys = np.array(lines)
     cyphArr = np.zeros((task6NumTry,8))
     for k in longKeys:
-        keysMat.append(findSubkey(k))
+        keysMat.append(findSubkey(k,NoLin))
     for i, (line, keys) in enumerate(zip(lines, keysMat)):
         i = 0
         if verbose : print("plaintext: ", line)
-        e = encrypt(line, keys, True)
+        e = encrypt(line, keys, NL=NL, NoLin=NoLin)
         cyphArr[i,:] = e
         i+=1
         if verbose : print("encrypting:", e)
-        d = decrypt(e,keys, True)
+        d = decrypt(e ,keys, NL=NL, NoLin=NoLin)
         if verbose : print("decrypting: ", d, "\n")
+    """
     LinMatA = findMatrixKey()
     if verbose : print("Mat A:\n", LinMatA.astype(int))
     LinMatB = findMatrixMessage()
@@ -45,6 +48,7 @@ def main():
 
     #code to test that the key founded is the right one
     k = findSubkey([6,6,5,4,6,5,2,8])
+    print("Cryping with the finded linear key:\n")
     for text in lines:
         prova = encrypt(text, k)
         print(prova)
@@ -64,19 +68,25 @@ def main():
         for i, k in enumerate(possibleNLKey):
             print("Possible key for NL number ", i+1, ":\n", list(map(round, k)))
 
+        POSSIBLE NL KEYS:
+            [7, 4, 3, 3, 6, 2, 7, 4]
+            [9, 3, 9, 5, 9, 6, 4, 9]
+            [9, 7, 9, 2, 10, 6, 7, 4]   --> actual key = [7,6,3,9,0,9,2,9]
+            [0, 0, 0, 4, 0, 6, 2, 5]
+            [6, 7, 6, 8, 1, 3, 3, 3]
+        
         #actual key test. It was finded by brute force
         k = findSubkey([7,6,3,9,0,9,2,9])
+        print("Cryping with the finded near linear key:\n")
         for text in lines:
             prova = encrypt(text, k, NL = True)
             print(prova)
-    
-"""
-POSSIBLE NL KEYS:
-    [7, 4, 3, 3, 6, 2, 7, 4]
-    [9, 3, 9, 5, 9, 6, 4, 9]
-    [9, 7, 9, 2, 10, 6, 7, 4]   --> actual key = [7,6,3,9,0,9,2,9]
-    [0, 0, 0, 4, 0, 6, 2, 5]
-    [6, 7, 6, 8, 1, 3, 3, 3]
-"""
+        """
+
+
+
+
+
+
 if __name__ == '__main__':
     main()
