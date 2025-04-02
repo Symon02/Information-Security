@@ -1,5 +1,7 @@
 import numpy as np
 import sympy as sp
+import sys
+import argparse
 
 from Crypter import *
 from MatrixOperation import *
@@ -12,6 +14,17 @@ NoLin=True
 verbose = True
 
 def main():
+    parser = argparse.ArgumentParser(description='Lab1Solver.')
+    parser.add_argument('-v', '--verbose', '-VERBOSE', action='store_true', help='Enable verbose output')
+    parser.add_argument('-nl', '--nearlylinear', '-NEARLYLINEAR', action='store_true', help='Enable nearly linear mode')
+    parser.add_argument('-NL', '--nonlinear', '-NONLINEAR', action='store_true', help='Enable non-linear mode')
+    args = parser.parse_args()
+    
+    verbose = args.verbose
+    NL = args.nearlylinear
+    NoLin = args.nonlinear
+
+
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
     if NL:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
@@ -82,10 +95,6 @@ def main():
             prova = encrypt(text, k, NL = True)
             print(prova)
         """
-
-
-
-
 
 
 if __name__ == '__main__':
