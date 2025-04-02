@@ -4,6 +4,7 @@ import sympy as sp
 from Crypter import *
 from MatrixOperation import *
 from KPACryptoanalysis import *
+from mimAttack import mimAttack
 
 task6NumTry = 50000
 p = 11
@@ -12,6 +13,7 @@ NoLin=True
 verbose = True
 
 def main():
+    """
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
     if NL:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
@@ -35,7 +37,6 @@ def main():
         if verbose : print("encrypting:", e)
         d = decrypt(e ,keys, NL=NL, NoLin=NoLin)
         if verbose : print("decrypting: ", d, "\n")
-    """
     LinMatA = findMatrixKey()
     if verbose : print("Mat A:\n", LinMatA.astype(int))
     LinMatB = findMatrixMessage()
@@ -81,12 +82,31 @@ def main():
         for text in lines:
             prova = encrypt(text, k, NL = True)
             print(prova)
+    intKey, extKey = mimAttack()
+    for ik, exk in zip(intKey, extKey):
+        print("Internal key: ", ik, "\nExternal key: ", exk)
         """
+    """
+    Internal key:  [6  5  9 10] 
+    External key:  [0 0 3 5]
+
+    Internal key:  [4 1 2 8]
+    External key:  [0 0 4 0]
+
+    Internal key:  [9 4 1 3]
+    External key:  [9 6 4 6]
+    """
+    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_non_linear.txt')
+    k1 = findSubkey([4, 1, 2, 8], True)
+    k2 = findSubkey([0, 0, 4, 0], True)
+    plain = lines[0]
+    e = encrypt(plain, k1, False, True)
+    e2 = encrypt(e, k2, False, True)
+    print(plain)
+    print(e)
+    print(e2)
 
 
-
-
-
-
+        
 if __name__ == '__main__':
     main()
