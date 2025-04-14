@@ -1,12 +1,11 @@
 import numpy as np
 import sympy as sp
-import sys
-import argparse
 
 from Crypter import *
 from MatrixOperation import *
 from KPACryptoanalysis import *
-
+from mimAttack import mimAttack
+import argparse
 task6NumTry = 50000
 p = 11
 NL=False
@@ -24,7 +23,7 @@ def main():
     NL = args.nearlylinear
     NoLin = args.nonlinear
 
-
+    
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
     if NL:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
@@ -48,7 +47,6 @@ def main():
         if verbose : print("encrypting:", e)
         d = decrypt(e ,keys, NL=NL, NoLin=NoLin)
         if verbose : print("decrypting: ", d, "\n")
-    """
     LinMatA = findMatrixKey()
     if verbose : print("Mat A:\n", LinMatA.astype(int))
     LinMatB = findMatrixMessage()
@@ -80,22 +78,45 @@ def main():
         possibleNLKey = KPACryptoanalysisNearLinear(lines, longKeys)
         for i, k in enumerate(possibleNLKey):
             print("Possible key for NL number ", i+1, ":\n", list(map(round, k)))
-
+        """
         POSSIBLE NL KEYS:
             [7, 4, 3, 3, 6, 2, 7, 4]
             [9, 3, 9, 5, 9, 6, 4, 9]
             [9, 7, 9, 2, 10, 6, 7, 4]   --> actual key = [7,6,3,9,0,9,2,9]
             [0, 0, 0, 4, 0, 6, 2, 5]
             [6, 7, 6, 8, 1, 3, 3, 3]
-        
+        """
         #actual key test. It was finded by brute force
         k = findSubkey([7,6,3,9,0,9,2,9])
         print("Cryping with the finded near linear key:\n")
         for text in lines:
             prova = encrypt(text, k, NL = True)
             print(prova)
+    intKey, extKey = mimAttack()
+    for ik, exk in zip(intKey, extKey):
+        print("Internal key: ", ik, "\nExternal key: ", exk)
         """
+    
+    Internal key:  [6  5  9 10] 
+    External key:  [0 0 3 5]
+
+    Internal key:  [4 1 2 8]
+    External key:  [0 0 4 0]
+
+    Internal key:  [9 4 1 3]
+    External key:  [9 6 4 6]
+    """
+    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_non_linear.txt')
+    k1 = findSubkey([4, 1, 2, 8], True)
+    k2 = findSubkey([0, 0, 4, 0], True)
+    plain = lines[0]
+    e = encrypt(plain, k1, False, True)
+    e2 = encrypt(e, k2, False, True)
+    print(plain)
+    print(e)
+    print(e2)
 
 
+        
 if __name__ == '__main__':
     main()
