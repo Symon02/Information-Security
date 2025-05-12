@@ -1,9 +1,13 @@
 use rayon::prelude::*;
+use rand::Rng;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 use serde::Serialize;
 use std::fs::File;
 use std::io::Write;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Instant;
+use indicatif::{ProgressBar, ProgressStyle};
+use std::sync::Arc;
 
 fn digit_sum(mut n: u128) -> usize {
     let mut sum = 0;
@@ -17,36 +21,47 @@ fn digit_sum(mut n: u128) -> usize {
 #[derive(Serialize)]
 struct Output {
     digit_sum_counts: Vec<u128>,
+    samples: u64,
 }
 
-fn k_sum_probability(K: u128) {
+fn sample_k_sum_probability(K: u32, n_samples: u64) {
     let start_time = Instant::now();
-    let max = 2u128.pow(K as u32);
-    let counter = AtomicUsize::new(0);
-    let progress_interval = 10_000_000;
+    let max_val = 2u128.pow(K);
+    let num_digits = ((max_val as f64).log10().floor() as usize) + 1;
+    let vec_size = 9 * num_digits + 1;
 
-    let max_num = 2u128.pow(K as u32) - 1;
-    let num_digits = ((max_num as f64).log10().floor() as usize) + 1;
-    let vec_size = 9 * num_digits + 1; // +1 just in case
+    // Progress bar
+    let pb = Arc::new(ProgressBar::new(n_samples));
+    pb.set_style(
+        ProgressStyle::with_template(
+            "[{elapsed_precise}] {wide_bar:.cyan/blue} {pos}/{len} ({eta})",
+        )
+        .unwrap()
+        .progress_chars("=>-"),
+    );
 
-    // Parallel computation
-    let result = (0..max)
+    // Parallel sampling
+    let result = (0..n_samples as usize)
         .into_par_iter()
-        .map_init(
-            || vec![0u128; vec_size],
-            |local_vec, k| {
-                let sum = digit_sum(k);
-                local_vec[sum] += 1;
+        .with_min_len(100_000)
+        .fold(
+            || {
+                let rng = SmallRng::from_entropy();
+                (vec![0u128; vec_size], rng)
+            },
+            {
+                let pb = pb.clone();
+                move |(mut local_vec, mut rng): (Vec<u128>, SmallRng), _| {
+                    let n = rng.gen_range(0..max_val);
+                    let sum = digit_sum(n);
+                    local_vec[sum] += 1;
 
-                let count = counter.fetch_add(1, Ordering::Relaxed);
-                if count % progress_interval == 0 {
-                    let elapsed = start_time.elapsed().as_secs();
-                    println!("Processed: {} (Elapsed: {}s)", count, elapsed);
+                    pb.inc(1);
+                    (local_vec, rng)
                 }
-
-                local_vec.clone()
             },
         )
+        .map(|(vec, _)| vec)
         .reduce(
             || vec![0u128; vec_size],
             |mut a, b| {
@@ -57,22 +72,28 @@ fn k_sum_probability(K: u128) {
             },
         );
 
-    println!("Finished in {:.2?}", start_time.elapsed());
+    pb.finish_with_message("Sampling complete");
 
-    // Serialize and save to JSON
+    // Serialize results
     let output = Output {
         digit_sum_counts: result,
+        samples: n_samples,
     };
 
     let json = serde_json::to_string_pretty(&output).unwrap();
-    let mut file =
-        File::create(format!("digit_sum_counts_{}.json", K)).expect("Failed to create file");
+    let filename = format!("digit_sum_sample_K{}_N{}.json", K, n_samples);
+    let mut file = File::create(&filename).expect("Failed to create file");
     file.write_all(json.as_bytes())
         .expect("Failed to write file");
 
-    println!("Results saved to digit_sum_counts.json");
+    println!(
+        "Finished {} samples in {:.2?}. Output saved to {}.",
+        n_samples,
+        start_time.elapsed(),
+        filename
+    );
 }
 
 fn main() {
-    k_sum_probability(18);
+    sample_k_sum_probability(100, 100_000_000_000);
 }
