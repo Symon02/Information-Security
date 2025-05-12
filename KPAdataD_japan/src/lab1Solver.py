@@ -4,15 +4,16 @@ import sympy as sp
 from Crypter import *
 from MatrixOperation import *
 from KPACryptoanalysis import *
-from mimAttack import mimAttack
+from mimAttack import mitmAttack
 import argparse
 task6NumTry = 50000
 p = 11
-NL=False
-NoLin=True
+NL=True
+NoLin=False
 verbose = True
 
 def main():
+    
     parser = argparse.ArgumentParser(description='Lab1Solver.')
     parser.add_argument('-v', '--verbose', '-VERBOSE', action='store_true', help='Enable verbose output')
     parser.add_argument('-nl', '--nearlylinear', '-NEARLYLINEAR', action='store_true', help='Enable nearly linear mode')
@@ -23,18 +24,18 @@ def main():
     NL = args.nearlylinear
     NoLin = args.nonlinear
 
-    
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_linear.txt')
     if NL:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
     if NoLin:
         lines, longKeys = readFile('KPAdataD_japan/KPApairsD_non_linear.txt')
-    #lines, longKeys = readFile('KPAdataD_japan/checkNoLin.txt')
+    lines, longKeys = readFile('KPAdataD_japan/check.txt')
     #lines, longKeys = np.random.randint(0, 10, (task6NumTry, 8)), np.random.randint(0, 10, (task6NumTry, 8))
+    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
     keysMat = []
-    if NL:
-        lines = np.array(lines)       
-        longKeys = np.array(lines)
+    #f NL:
+        #lines = np.array(lines)       
+        #longKeys = np.array(lines)
     cyphArr = np.zeros((task6NumTry,8))
     for k in longKeys:
         keysMat.append(findSubkey(k,NoLin))
@@ -66,7 +67,8 @@ def main():
     
 
     #Start Near Linear Task --> Change the NL variable at the top of the file
-    if NL:
+    lines, longKeys = readFile('KPAdataD_japan/KPApairsD_nearly_linear.txt')
+    if True:
         NLmatA = findMatrixKey(NL)
         NLmatB = findMatrixMessage(NL)
         NLmatC = findMatrixC()
@@ -78,6 +80,7 @@ def main():
         possibleNLKey = KPACryptoanalysisNearLinear(lines, longKeys)
         for i, k in enumerate(possibleNLKey):
             print("Possible key for NL number ", i+1, ":\n", list(map(round, k)))
+        
         """
         POSSIBLE NL KEYS:
             [7, 4, 3, 3, 6, 2, 7, 4]
@@ -85,6 +88,7 @@ def main():
             [9, 7, 9, 2, 10, 6, 7, 4]   --> actual key = [7,6,3,9,0,9,2,9]
             [0, 0, 0, 4, 0, 6, 2, 5]
             [6, 7, 6, 8, 1, 3, 3, 3]
+
         """
         #actual key test. It was finded by brute force
         k = findSubkey([7,6,3,9,0,9,2,9])
@@ -92,29 +96,23 @@ def main():
         for text in lines:
             prova = encrypt(text, k, NL = True)
             print(prova)
-    intKey, extKey = mimAttack()
+    intKey, extKey = mitmAttack()
     for ik, exk in zip(intKey, extKey):
         print("Internal key: ", ik, "\nExternal key: ", exk)
-        """
-    
-    Internal key:  [6  5  9 10] 
-    External key:  [0 0 3 5]
+        
 
-    Internal key:  [4 1 2 8]
-    External key:  [0 0 4 0]
-
-    Internal key:  [9 4 1 3]
-    External key:  [9 6 4 6]
-    """
     lines, longKeys = readFile('KPAdataD_japan/KPApairsD_non_linear.txt')
-    k1 = findSubkey([4, 1, 2, 8], True)
-    k2 = findSubkey([0, 0, 4, 0], True)
-    plain = lines[0]
-    e = encrypt(plain, k1, False, True)
-    e2 = encrypt(e, k2, False, True)
-    print(plain)
-    print(e)
-    print(e2)
+
+    # Testing if the pairs of keys founded by mitm attack are actually the correct ones
+    k1 = findSubkey([0, 5, 4, 0], True)    
+    k2 = findSubkey([10, 8, 0, 6], True)
+    for line, cypher in zip(lines, longKeys): 
+        print("plain: ", line)
+        e = encrypt(line, k1, False, True)
+        print("e:", e)
+        e2 = encrypt(e, k2, False, True)
+        print("e2: ", e2)
+        print("Actual encryption: ", cypher)
 
 
         

@@ -71,7 +71,7 @@ def encrypt(line, key, NL = False, NoLin = False):
     if NL:
         y_fin = blockSNL(v_fin)
     elif NoLin:
-        y_fin =noLinBlockS(v_fin)
+        y_fin = noLinBlockS(v_fin)
     else:
         y_fin = blockS(v_fin)
     z_fin = blockT(y_fin)

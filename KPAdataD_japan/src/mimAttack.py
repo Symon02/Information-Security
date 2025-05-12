@@ -3,35 +3,51 @@ import sympy as sp
 from Crypter import encrypt, decrypt, findSubkey, readFile
 
 p = 11
-task8NumKey = 5000
 
-def mimAttack():
-    plaintexts, cyphertexts = readFile('KPAdataD_japan/KPApairsD_non_linear.txt')
-    decryptedCyph = {}
-    cryptedPlain = {}
-    keys1, keys2 = np.random.randint(0, 11, (task8NumKey, 4)), np.random.randint(0, 11, (task8NumKey, 4))
-    k1Mat = []
-    k2Mat =[]
-    for k1 in keys1:
-        k1Mat.append(findSubkey(k1, True))
-    for k2 in keys2:
-        k2Mat.append(findSubkey(k2, True))
-    for plain in plaintexts:
-        for i, intK in enumerate(k1Mat):
-            intK = np.array(intK)
-            e = encrypt(plain, intK, False, True)
-            cryptedPlain[tuple(e.tolist())] = keys1[i]
-    for cyph in cyphertexts:
-        for i, extK in enumerate(k2Mat):
-            extK = np.array(extK)
-            d = decrypt(cyph, extK, False, True)
-            decryptedCyph[tuple(d.tolist())] = keys2[i]
-    common_keys = cryptedPlain.keys() & decryptedCyph.keys()
-    internalKey = []
-    externalKey = []
-    for k in common_keys:
-        print(cryptedPlain[k])
-        internalKey.append(cryptedPlain[k])
-        print(decryptedCyph[k])
-        externalKey.append(decryptedCyph[k])
-    return internalKey, externalKey
+def key_gen():
+    key = np.random.randint(0, p, 4)
+    return key
+
+
+def mitmAttack():
+    u1 = [6,3,5,2,0,2,3,4]
+    x1 = [1,1,10,8,4,3,7,3]
+    dictionary_1 = {}
+    dictionary_2 = {}
+
+    thousand_keys_1 = []
+    for i in range(0, 80000):
+        thousand_keys_1.append(key_gen())
+
+    thousand_keys_1 = np.array(thousand_keys_1)
+    thousand_keys_1 = np.unique(thousand_keys_1, axis=0).tolist()
+    print(len(thousand_keys_1))
+
+    thousand_keys_2 = []
+    for i in range(0, 80000):
+        thousand_keys_2.append(key_gen())
+
+    thousand_keys_2 = np.array(thousand_keys_2)
+    thousand_keys_2 = np.unique(thousand_keys_2, axis=0).tolist()
+    print(len(thousand_keys_2))
+
+    for i in range(0, len(thousand_keys_1)):
+        k1 = findSubkey(thousand_keys_1[i], True)
+        dictionary_1[i] = encrypt(u1, k1, False, True)
+    
+    for i in range(0, len(thousand_keys_2)):
+        k2 = findSubkey(thousand_keys_2[i], True)
+        dictionary_2[i] = decrypt(x1, k2, False, True)
+
+    dict(sorted(dictionary_1.items(), key=lambda item: item[1].all()))
+    dict(sorted(dictionary_2.items(), key=lambda item: item[1].all()))
+
+    for i in range(0, len(thousand_keys_1)):
+        for j in range(0, len(thousand_keys_2)):
+            if np.array_equal(dictionary_1[i], dictionary_2[j]):
+                print("Found a match!")
+                print("Key 1 = ", thousand_keys_1[i])
+                print("Key 2 = ", thousand_keys_2[j])
+                print("Ciphertext = ", dictionary_1[i])
+                print("Plaintext = ", dictionary_2[j])
+                break

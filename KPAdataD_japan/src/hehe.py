@@ -37,9 +37,7 @@ def main():
         
         if np.array_equal(en, ct):
             validKeys.append(k)
-            print('Valid key found: ', k)    
-    # print('Encrypted text: ', en)
-    # print('Cypertext     : ', ct)
+            print('Valid key found: ', k)
 
         
 
