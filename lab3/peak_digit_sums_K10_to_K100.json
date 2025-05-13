@@ -1,0 +1,457 @@
+[
+  {
+    "K": 10,
+    "most_frequent_sum": 14,
+    "count": 7327871
+  },
+  {
+    "K": 11,
+    "most_frequent_sum": 13,
+    "count": 7374516
+  },
+  {
+    "K": 12,
+    "most_frequent_sum": 15,
+    "count": 7423150
+  },
+  {
+    "K": 13,
+    "most_frequent_sum": 17,
+    "count": 7064914
+  },
+  {
+    "K": 14,
+    "most_frequent_sum": 18,
+    "count": 6922957
+  },
+  {
+    "K": 15,
+    "most_frequent_sum": 19,
+    "count": 6693220
+  },
+  {
+    "K": 16,
+    "most_frequent_sum": 21,
+    "count": 6499635
+  },
+  {
+    "K": 17,
+    "most_frequent_sum": 22,
+    "count": 6058056
+  },
+  {
+    "K": 18,
+    "most_frequent_sum": 23,
+    "count": 6110160
+  },
+  {
+    "K": 19,
+    "most_frequent_sum": 24,
+    "count": 5914493
+  },
+  {
+    "K": 20,
+    "most_frequent_sum": 27,
+    "count": 5455167
+  },
+  {
+    "K": 21,
+    "most_frequent_sum": 27,
+    "count": 5507227
+  },
+  {
+    "K": 22,
+    "most_frequent_sum": 28,
+    "count": 5478213
+  },
+  {
+    "K": 23,
+    "most_frequent_sum": 31,
+    "count": 5294728
+  },
+  {
+    "K": 24,
+    "most_frequent_sum": 31,
+    "count": 5234536
+  },
+  {
+    "K": 25,
+    "most_frequent_sum": 32,
+    "count": 5144225
+  },
+  {
+    "K": 26,
+    "most_frequent_sum": 34,
+    "count": 5034304
+  },
+  {
+    "K": 27,
+    "most_frequent_sum": 35,
+    "count": 4845812
+  },
+  {
+    "K": 28,
+    "most_frequent_sum": 36,
+    "count": 4858640
+  },
+  {
+    "K": 29,
+    "most_frequent_sum": 38,
+    "count": 4779988
+  },
+  {
+    "K": 30,
+    "most_frequent_sum": 40,
+    "count": 4527050
+  },
+  {
+    "K": 31,
+    "most_frequent_sum": 41,
+    "count": 4534662
+  },
+  {
+    "K": 32,
+    "most_frequent_sum": 42,
+    "count": 4531594
+  },
+  {
+    "K": 33,
+    "most_frequent_sum": 44,
+    "count": 4414627
+  },
+  {
+    "K": 34,
+    "most_frequent_sum": 45,
+    "count": 4376393
+  },
+  {
+    "K": 35,
+    "most_frequent_sum": 46,
+    "count": 4330962
+  },
+  {
+    "K": 36,
+    "most_frequent_sum": 48,
+    "count": 4252068
+  },
+  {
+    "K": 37,
+    "most_frequent_sum": 49,
+    "count": 4158418
+  },
+  {
+    "K": 38,
+    "most_frequent_sum": 50,
+    "count": 4156340
+  },
+  {
+    "K": 39,
+    "most_frequent_sum": 52,
+    "count": 4103862
+  },
+  {
+    "K": 40,
+    "most_frequent_sum": 54,
+    "count": 3950478
+  },
+  {
+    "K": 41,
+    "most_frequent_sum": 54,
+    "count": 3957130
+  },
+  {
+    "K": 42,
+    "most_frequent_sum": 55,
+    "count": 3944703
+  },
+  {
+    "K": 43,
+    "most_frequent_sum": 58,
+    "count": 3853145
+  },
+  {
+    "K": 44,
+    "most_frequent_sum": 58,
+    "count": 3839852
+  },
+  {
+    "K": 45,
+    "most_frequent_sum": 59,
+    "count": 3810071
+  },
+  {
+    "K": 46,
+    "most_frequent_sum": 61,
+    "count": 3737400
+  },
+  {
+    "K": 47,
+    "most_frequent_sum": 62,
+    "count": 3688300
+  },
+  {
+    "K": 48,
+    "most_frequent_sum": 64,
+    "count": 3680705
+  },
+  {
+    "K": 49,
+    "most_frequent_sum": 65,
+    "count": 3652891
+  },
+  {
+    "K": 50,
+    "most_frequent_sum": 67,
+    "count": 3537932
+  },
+  {
+    "K": 51,
+    "most_frequent_sum": 68,
+    "count": 3547848
+  },
+  {
+    "K": 52,
+    "most_frequent_sum": 69,
+    "count": 3548170
+  },
+  {
+    "K": 53,
+    "most_frequent_sum": 71,
+    "count": 3455978
+  },
+  {
+    "K": 54,
+    "most_frequent_sum": 72,
+    "count": 3458200
+  },
+  {
+    "K": 55,
+    "most_frequent_sum": 73,
+    "count": 3443674
+  },
+  {
+    "K": 56,
+    "most_frequent_sum": 75,
+    "count": 3394602
+  },
+  {
+    "K": 57,
+    "most_frequent_sum": 76,
+    "count": 3360440
+  },
+  {
+    "K": 58,
+    "most_frequent_sum": 77,
+    "count": 3345978
+  },
+  {
+    "K": 59,
+    "most_frequent_sum": 79,
+    "count": 3321326
+  },
+  {
+    "K": 60,
+    "most_frequent_sum": 81,
+    "count": 3235534
+  },
+  {
+    "K": 61,
+    "most_frequent_sum": 81,
+    "count": 3247836
+  },
+  {
+    "K": 62,
+    "most_frequent_sum": 83,
+    "count": 3241168
+  },
+  {
+    "K": 63,
+    "most_frequent_sum": 85,
+    "count": 3181030
+  },
+  {
+    "K": 64,
+    "most_frequent_sum": 86,
+    "count": 3177458
+  },
+  {
+    "K": 65,
+    "most_frequent_sum": 87,
+    "count": 3161352
+  },
+  {
+    "K": 66,
+    "most_frequent_sum": 88,
+    "count": 3125066
+  },
+  {
+    "K": 67,
+    "most_frequent_sum": 90,
+    "count": 3097529
+  },
+  {
+    "K": 68,
+    "most_frequent_sum": 91,
+    "count": 3082784
+  },
+  {
+    "K": 69,
+    "most_frequent_sum": 93,
+    "count": 3060465
+  },
+  {
+    "K": 70,
+    "most_frequent_sum": 94,
+    "count": 3004586
+  },
+  {
+    "K": 71,
+    "most_frequent_sum": 95,
+    "count": 3012608
+  },
+  {
+    "K": 72,
+    "most_frequent_sum": 96,
+    "count": 3005954
+  },
+  {
+    "K": 73,
+    "most_frequent_sum": 99,
+    "count": 2957936
+  },
+  {
+    "K": 74,
+    "most_frequent_sum": 99,
+    "count": 2950423
+  },
+  {
+    "K": 75,
+    "most_frequent_sum": 100,
+    "count": 2943049
+  },
+  {
+    "K": 76,
+    "most_frequent_sum": 102,
+    "count": 2916388
+  },
+  {
+    "K": 77,
+    "most_frequent_sum": 103,
+    "count": 2889032
+  },
+  {
+    "K": 78,
+    "most_frequent_sum": 104,
+    "count": 2870121
+  },
+  {
+    "K": 79,
+    "most_frequent_sum": 106,
+    "count": 2854253
+  },
+  {
+    "K": 80,
+    "most_frequent_sum": 107,
+    "count": 2815900
+  },
+  {
+    "K": 81,
+    "most_frequent_sum": 108,
+    "count": 2821858
+  },
+  {
+    "K": 82,
+    "most_frequent_sum": 110,
+    "count": 2809932
+  },
+  {
+    "K": 83,
+    "most_frequent_sum": 112,
+    "count": 2776487
+  },
+  {
+    "K": 84,
+    "most_frequent_sum": 112,
+    "count": 2767379
+  },
+  {
+    "K": 85,
+    "most_frequent_sum": 114,
+    "count": 2757568
+  },
+  {
+    "K": 86,
+    "most_frequent_sum": 116,
+    "count": 2734312
+  },
+  {
+    "K": 87,
+    "most_frequent_sum": 116,
+    "count": 2719330
+  },
+  {
+    "K": 88,
+    "most_frequent_sum": 118,
+    "count": 2703169
+  },
+  {
+    "K": 89,
+    "most_frequent_sum": 119,
+    "count": 2692379
+  },
+  {
+    "K": 90,
+    "most_frequent_sum": 121,
+    "count": 2659398
+  },
+  {
+    "K": 91,
+    "most_frequent_sum": 122,
+    "count": 2663254
+  },
+  {
+    "K": 92,
+    "most_frequent_sum": 123,
+    "count": 2649679
+  },
+  {
+    "K": 93,
+    "most_frequent_sum": 126,
+    "count": 2613333
+  },
+  {
+    "K": 94,
+    "most_frequent_sum": 126,
+    "count": 2613227
+  },
+  {
+    "K": 95,
+    "most_frequent_sum": 127,
+    "count": 2605965
+  },
+  {
+    "K": 96,
+    "most_frequent_sum": 129,
+    "count": 2583650
+  },
+  {
+    "K": 97,
+    "most_frequent_sum": 130,
+    "count": 2578011
+  },
+  {
+    "K": 98,
+    "most_frequent_sum": 132,
+    "count": 2561947
+  },
+  {
+    "K": 99,
+    "most_frequent_sum": 133,
+    "count": 2553727
+  },
+  {
+    "K": 100,
+    "most_frequent_sum": 134,
+    "count": 2524445
+  }
+]
